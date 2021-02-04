@@ -364,16 +364,7 @@ class DMFTLauncher:
             os.makedirs(self.type)
 
         # copying files into DMFT or HF directory
-        if self.structurename is not None and self.dft is not None:
-            cmd = (
-                "cd "
-                + self.type
-                + " && Copy_input.py ../ "
-                + "-structurename "
-                + self.structurename
-            )
-        else:
-            cmd = "cd " + self.type + " && Copy_input.py ../ "
+        cmd = "cd " + self.type + " && Copy_input.py ../ "
         out, err = subprocess.Popen(cmd, shell=True).communicate()
         if err:
             print("File copy failed!\n")

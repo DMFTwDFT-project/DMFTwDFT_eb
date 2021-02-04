@@ -39,6 +39,14 @@ if __name__ == "__main__":
         print("The directory " + cpdr + " does not exists!")
         sys.exit(1)
 
+    if os.path.exists(cpdr + "/seedname.dat"):
+        shutil.copy2(cpdr + "/seedname.dat", ".")
+        fi = open(cpdr + "/seedname.dat", "r")
+        structurename = str(fi.readline())
+        fi.close()
+    else:
+        structurename = None
+
     if post == "dos":
 
         if structurename is None:
@@ -69,8 +77,7 @@ if __name__ == "__main__":
             else:
                 print(files + " must exist in a " + cpdr + " directory! Exiting!")
                 sys.exit(1)
-        if os.path.exists(cpdr + "/seedname.dat"):
-            shutil.copy2(cpdr + "/seedname.dat", ".")
+
         exec(compile(open("INPUT.py", "rb").read(), "INPUT.py", "exec"))
 
     elif post == "bands":

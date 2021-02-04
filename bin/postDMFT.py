@@ -49,21 +49,21 @@ plt.rc("ytick", labelsize=22)  # fontsize of the tick labels
 class PostProcess:
     """DMFTwDFT post processing tool.
 
-	This class contains methods to perform post processing of the DMFT calculations.
-	Run inside the DMFT or HF directories.
+    This class contains methods to perform post processing of the DMFT calculations.
+    Run inside the DMFT or HF directories.
 
-        Usage:
-	postDMFT.py <options>
+    Usage:
+    postDMFT.py <options>
 
-	-h for help.
+    -h for help.
 
-	<options>:
-	ac    : Performs analytic continuation.
-	dos   : Performs density of states calculation.
-	bands : Performs band structure calculation.
+    <options>:
+    ac    : Performs analytic continuation.
+    dos   : Performs density of states calculation.
+    bands : Performs band structure calculation.
 
 
-	"""
+    """
 
     def __init__(self):
         """
@@ -82,8 +82,8 @@ class PostProcess:
 
     def checksig(self):
         """
-		Checks if Sig.out is created in the ac directory.
-		"""
+        Checks if Sig.out is created in the ac directory.
+        """
 
         if os.path.exists("./ac/Sig.out"):
             return True
@@ -93,8 +93,8 @@ class PostProcess:
 
     def interpol(self, emin, emax, rom, broaden, dest_dir, sp=False):
         """
-	This performs the interpolation of points on the real axis.
-	"""
+        This performs the interpolation of points on the real axis.
+        """
         print("\nInterpolating points on real axis...")
         headerline = 2
         om, Sig = Fileio.Read_complex_multilines("./ac/Sig.out", headerline)
@@ -226,8 +226,8 @@ class PostProcess:
 
     def anal_cont(self, args):
         """
-		This method performs the analytic continuation.
-		"""
+        This method performs the analytic continuation.
+        """
 
         siglistindx = args.siglistindx
 
@@ -331,8 +331,8 @@ class PostProcess:
 
     def dos(self, args):
         """
-		This method performs the Density of States calculation.
-		"""
+        This method performs the Density of States calculation.
+        """
 
         dest_dir = "dos"
 
@@ -428,8 +428,8 @@ class PostProcess:
 
     def plot_dos(self, args):
         """
-	This method plots the density of states plot.
-	"""
+        This method plots the density of states plot.
+        """
 
         # mapping d and p orbitals with atoms
         d_indices = [i for i, x in enumerate(p["orbs"]) if x == "d"]
@@ -616,8 +616,8 @@ class PostProcess:
 
     def bands(self, args):
         """
-	This method performs the band structure calculations.
-	"""
+        This method performs the band structure calculations.
+        """
         if args.elim:
             self.emin = args.elim[0]
             self.emax = args.elim[1]
@@ -931,7 +931,13 @@ class PostProcess:
             extent=[xmin, xmax, ymin, ymax],
             aspect="auto",
         )
-        cb = fig.colorbar(im, orientation="vertical", pad=0.05, shrink=1.0, ax=ax,)
+        cb = fig.colorbar(
+            im,
+            orientation="vertical",
+            pad=0.05,
+            shrink=1.0,
+            ax=ax,
+        )
         cb.ax.tick_params()
 
         ax.set_xticks(SKP)
@@ -1063,7 +1069,13 @@ class PostProcess:
             extent=[xmin, xmax, ymin, ymax],
             aspect="auto",
         )
-        cb = fig.colorbar(im, orientation="vertical", pad=0.05, shrink=1.0, ax=ax,)
+        cb = fig.colorbar(
+            im,
+            orientation="vertical",
+            pad=0.05,
+            shrink=1.0,
+            ax=ax,
+        )
         cb.ax.tick_params()
 
         ax.set_xticks(SKP)
@@ -1083,8 +1095,8 @@ class PostProcess:
 
     def plot_sp_bands(self, args):
         """
-	This method plots spin-polarized bands.
-	"""
+        This method plots spin-polarized bands.
+        """
 
         print("Plotting spin-polarized band structure...")
 
@@ -1211,7 +1223,11 @@ class PostProcess:
                 aspect="auto",
             )
             cb1 = fig.colorbar(
-                im1, orientation="vertical", pad=0.05, shrink=1.0, ax=ax1,
+                im1,
+                orientation="vertical",
+                pad=0.05,
+                shrink=1.0,
+                ax=ax1,
             )
             cb1.ax.tick_params()
             ax1.set_title("Spin Up")
@@ -1231,7 +1247,11 @@ class PostProcess:
                 aspect="auto",
             )
             cb2 = fig.colorbar(
-                im2, orientation="vertical", pad=0.05, shrink=1.0, ax=ax2,
+                im2,
+                orientation="vertical",
+                pad=0.05,
+                shrink=1.0,
+                ax=ax2,
             )
             cb2.ax.tick_params()
             ax2.set_title("Spin Down")
@@ -1279,7 +1299,13 @@ class PostProcess:
                 extent=[xmin, xmax, ymin, ymax],
                 aspect="auto",
             )
-            cb = fig.colorbar(im, orientation="vertical", pad=0.05, shrink=1.0, ax=ax,)
+            cb = fig.colorbar(
+                im,
+                orientation="vertical",
+                pad=0.05,
+                shrink=1.0,
+                ax=ax,
+            )
             cb.ax.tick_params()
 
             ax.set_title("Spin Up")
@@ -1312,7 +1338,13 @@ class PostProcess:
                 extent=[xmin, xmax, ymin, ymax],
                 aspect="auto",
             )
-            cb = fig.colorbar(im, orientation="vertical", pad=0.05, shrink=1.0, ax=ax,)
+            cb = fig.colorbar(
+                im,
+                orientation="vertical",
+                pad=0.05,
+                shrink=1.0,
+                ax=ax,
+            )
             cb.ax.tick_params()
 
             ax.set_title("Spin Down")

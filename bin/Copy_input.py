@@ -110,6 +110,7 @@ if __name__ == "__main__":
                 print(files + " must exist in a " + cpdr + " directory! Exiting!")
                 sys.exit(1)
 
+        if structurename:
             # dmft_ksum_band looks for wannier90 files.
             # Renaming is just easier.
             shutil.copy(str(structurename) + ".chk", "wannier90.chk")

@@ -29,19 +29,11 @@ if __name__ == "__main__":
         help="Copy files for dos or band structure calculation?",
         choices=["dos", "bands"],
     )
-    parser.add_argument(
-        "-dft",
-        default="vasp",
-        type=str,
-        help="Choice of DFT code for the DMFT calculation.",
-        choices=["vasp", "siesta", "qe"],
-    )
     args = parser.parse_args()
 
     cpdr = args.cpdr
     post = args.post
-    structure = args.structurename
-    dft = args.dft
+    structurename = args.structurename
 
     if not os.path.exists(cpdr):
         print("The directory " + cpdr + " does not exists!")
@@ -57,13 +49,39 @@ if __name__ == "__main__":
             "INPUT.py",
             "para_com.dat",
         ]
-        for files in dosfiles:
+        dosfiles_seedname = [
+            structurename + ".chk",
+            structurename + ".eig",
+            "DFT_mu.out",
+            "DMFT_mu.out",
+            "dmft_params.dat",
+            "INPUT.py",
+            "para_com.dat",
+        ]
+
+        for i, files in enumerate(dosfiles):
             if os.path.exists(cpdr + "/" + files):
                 print("Copying dos file " + files + " to the current directory")
                 shutil.copy2(cpdr + "/" + files, ".")
+            elif os.path.exists(cpdr + "/" + dosfiles_seedname[i]):
+                print(
+                    "Copying dos file "
+                    + dosfiles_seedname[i]
+                    + " to the current directory"
+                )
+                shutil.copy2(cpdr + "/" + dosfiles_seedname[i], ".")
             else:
-                print(files + " must exist in a " + cpdr + " directory! Exiting!")
+                print(
+                    files
+                    + " or "
+                    + dosfiles_seedname[i]
+                    + " must exist in a "
+                    + cpdr
+                    + " directory! Exiting!"
+                )
                 sys.exit(1)
+        if os.path.exists(cpdr + "/seedname.dat"):
+            shutil.copy2(cpdr + "/seedname.dat", ".")
         exec(compile(open("INPUT.py", "rb").read(), "INPUT.py", "exec"))
 
     elif post == "bands":
@@ -77,13 +95,39 @@ if __name__ == "__main__":
             "SigMdc.out",
             "SigMdc_dn.out",
         ]
-        for files in bandsfiles:
+        bandsfiles_seedname = [
+            structurename + ".chk",
+            structurename + ".eig",
+            "DMFT_mu.out",
+            "dmft_params.dat",
+            "INPUT.py",
+            "para_com.dat",
+            "SigMdc.out",
+            "SigMdc_dn.out",
+        ]
+        for i, files in enumerate(bandsfiles):
             if os.path.exists(cpdr + "/" + files):
                 print("Copying bands file " + files + " to the current directory")
                 shutil.copy2(cpdr + "/" + files, ".")
+            elif os.path.exists(cpdr + "/" + bandsfiles_seedname[i]):
+                print(
+                    "Copying bands file "
+                    + bandsfiles_seedname[i]
+                    + " to the current directory"
+                )
+                shutil.copy2(cpdr + "/" + bandsfiles_seedname[i], ".")
             else:
-                print(files + " must exist in a " + cpdr + " directory! Exiting!")
+                print(
+                    files
+                    + " or "
+                    + bandsfiles_seedname[i]
+                    + " must exist in a "
+                    + cpdr
+                    + " directory! Exiting!"
+                )
                 sys.exit(1)
+        if os.path.exists(cpdr + "/seedname.dat"):
+            shutil.copy2(cpdr + "/seedname.dat", ".")
         exec(compile(open("INPUT.py", "rb").read(), "INPUT.py", "exec"))
 
     else:
@@ -98,9 +142,19 @@ if __name__ == "__main__":
                 "WAVECAR",
                 "para_com.dat",
             ],
-            "Siesta": [str(structure) + ".out", "para_com.dat", "POSCAR"],
+            "Siesta": [
+                str(structurename) + ".out",
+                "para_com.dat",
+                "POSCAR",
+                "seedname.dat",
+            ],
             "aiida": ["aiida.out", "POSCAR"],
-            "Quantum Espresso": [str(structure) + ".scf.out", "para_com.dat", "POSCAR"],
+            "Quantum Espresso": [
+                str(structurename) + ".scf.out",
+                "para_com.dat",
+                "POSCAR",
+                "seedname.dat",
+            ],
         }
         Ldft = False
         for dft in DFTfiles:
@@ -141,7 +195,7 @@ if __name__ == "__main__":
                 fi = open(cpdr + "/" + outfile, "r")
 
                 # vasp case
-                if dft == "vasp":
+                if dft == "VASP":
                     EFermi = 0
                     for line in fi:
                         if re.search("Fermi energy", line) or re.search(
@@ -156,10 +210,19 @@ if __name__ == "__main__":
                     fi.close()
 
                 # Siesta case
-                if dft == "siesta":
+                elif dft == "Siesta":
                     data = fi.read()
                     Efermi = float(
                         re.findall(r"Fermi\s=[\s0-9+-.]*", data)[0].split()[-1]
+                    )
+                    savetxt("./DFT_mu.out", array([EFermi]))
+                    fi.close()
+
+                # Quantum Espresso case
+                elif dft == "Quantum Espresso" or dft == "aiida":
+                    data = fi.read()
+                    Efermi = float(
+                        re.findall(r"the\s*Fermi\s*energy\s*is\s*([\s\d.]*)ev", data)[0]
                     )
                     savetxt("./DFT_mu.out", array([EFermi]))
                     fi.close()
@@ -170,13 +233,36 @@ if __name__ == "__main__":
             "wannier90.win",
             "wannier90.amn",
         ]
+        Wannierfiles_seedname = [
+            structurename + ".chk",
+            structurename + ".eig",
+            structurename + ".win",
+            structurename + ".amn",
+        ]
+
         for i, files in enumerate(Wannierfiles):
             # copy files
             if os.path.exists(cpdr + "/" + files):
                 print("Copying Wannier file " + files + " to the current directory")
                 shutil.copy2(cpdr + "/" + files, ".")
+
+            elif os.path.exists(cpdr + "/" + Wannierfiles_seedname[i]):
+                print(
+                    "Copying Wannier file "
+                    + Wannierfiles_seedname[i]
+                    + " to the current directory"
+                )
+                shutil.copy2(cpdr + "/" + Wannierfiles_seedname[i], ".")
+
             else:
-                print(files + " must exist in a " + cpdr + " directory! Exiting!")
+                print(
+                    files
+                    + " or "
+                    + Wannierfiles_seedname[i]
+                    + " must exist in a "
+                    + cpdr
+                    + " directory! Exiting!"
+                )
                 sys.exit(1)
                 # if i<2:
                 #   print files+" must exist in a "+cpdr+" directory! Exiting!"; sys.exit(1)

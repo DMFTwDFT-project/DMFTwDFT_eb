@@ -47,14 +47,30 @@ module read_inputs
   real(kind=dp), save :: mu
   real(kind=dp), save :: mu_DFT
   real(kind=dp), save :: broaden
+  logical, save :: have_seedname
+  character(len=10) :: seedname
   
 
 contains
+
+  subroutine check_seedname()
+
+    implicit none
+
+    ! Checking to see if seedname.dat is available
+    inquire(file="seedname.dat",exist=have_seedname)
+    if (have_seedname .eqv. .true.) then
+        open(unit=20,file='seedname.dat',status='old',form='unformatted')
+        read(20) seedname
+        close(20)
+    endif
+
+  end subroutine
  
   subroutine Read_wan_chk()
 
     use constants, only: cmplx_0,eps6
-    use io, only: io_error, io_file_unit, stdout, seedname
+    use io, only: io_error, io_file_unit, stdout 
 
     implicit none
 
@@ -75,12 +91,25 @@ contains
     complex(kind=dp),allocatable:: DMFT_M(:,:)
     complex(kind=dp),allocatable:: DMFT_U(:),t_DMFT_U(:)
 
-    inquire(file='wannier90.chk',exist=iffile)
-    if (iffile.eqv. .false.)then
-       write(*,*) 'wannier90.chk must be present!!'
-       STOP
+
+    if (have_seedname .eqv. .true.) then
+        inquire(file=trim(seedname)//'.chk',exist=iffile)
+        if (iffile.eqv. .false.)then
+            write(*,*) trim(seedname)//'.chk must be present!!'
+            STOP
+        else
+            open(unit=20,file=trim(seedname)//'.chk',status='old',form='unformatted')
+        endif
     else
-       open(unit=20,file='wannier90.chk',status='old',form='unformatted')
+        inquire(file='wannier90.chk',exist=iffile)
+        if (iffile.eqv. .false.) then
+            write(*,*) 'wannier90.chk must be present!!'
+            STOP
+        else
+            open(unit=20,file='wannier90.chk',status='old',form='unformatted')
+        endif
+    endif
+
        read(20) header
        read(20) num_bands
        read(20) num_exclude_bands
@@ -150,7 +179,6 @@ contains
        endif
        read(20) (((u_matrix(i,j,k),i=1,num_wann),j=1,num_wann),k=1,num_kpts)
        close(20)
-    endif
 
     if (.not. allocated(ikpt)) then
       allocate (ikpt(3,num_kpts), stat=ierr)
@@ -413,12 +441,24 @@ contains
     amn_mat=cmplx_0
     !write(*,*) num_kpts,num_wann,num_bands
 
-    inquire(file='wannier90.amn',exist=iffile)
-    if (iffile.eqv. .false.)then
-       write(*,*) 'wannier90.amn must be present!!'
-       STOP
+    if (have_seedname .eqv. .true.) then
+        inquire(file=trim(seedname)//'.amn',exist=iffile)
+        if (iffile.eqv. .false.)then
+            write(*,*) trim(seedname)//'.amn must be present!!'
+            STOP
+        else
+            open(unit=30,file=trim(seedname)//'.amn',status='old',form='formatted')
+        endif
     else
-       open(unit=30,file='wannier90.amn',status='old',form='formatted')
+        inquire(file='wannier90.amn',exist=iffile)
+        if (iffile.eqv. .false.) then
+            write(*,*) 'wannier90.amn must be present!!'
+            STOP
+        else
+            open(unit=30,file='wannier90.amn',status='old',form='formatted')
+        endif
+    endif
+
        read(30,*) header
        read(30,*) header
        do i=1,num_kpts
@@ -431,7 +471,6 @@ contains
          enddo
        enddo
        close(30)
-    endif
     !write(*,*) amn_mat(1,1,1)
   end subroutine Read_wan_amn
 
@@ -452,18 +491,39 @@ contains
     endif
 
     eigvals=0.0_dp
-    inquire(file='wannier90.eig',exist=iffile)
-    if (iffile.eqv. .false.) then
-       write(*,*) 'wannier90.eig must be present!!'
-       STOP
+
+    if (have_seedname .eqv. .true.) then
+        ! Siesta generates the seedname.eigW file.
+        ! If not found wil try to find .eig file.
+        inquire(file=trim(seedname)//'.eigW',exist=iffile)
+        if (iffile .eqv. .false.) then
+            ! Check for other DFT codes that just generate .eig
+            inquire(file=trim(seedname)//'.eig',exist=iffile)
+            if (iffile .eqv. .false.) then
+                write(*,*) trim(seedname)//'.eig must be present!!'
+                STOP
+            else
+                open(unit=20,file=trim(seedname)//'.eig',status='old',form='formatted')
+            endif
+        else
+            open(unit=20,file=trim(seedname)//'.eigW',status='old',form='formatted')
+        endif
+
     else
-       open(unit=20,file='wannier90.eig',status='old',form='formatted')
+        inquire(file='wannier90.eig',exist=iffile)
+        if (iffile.eqv. .false.) then
+            write(*,*) 'wannier90.eig must be present!!'
+            STOP
+        else
+            open(unit=20,file='wannier90.eig',status='old',form='formatted')
+        endif
+    endif
+
        DO nkp=1,num_kpts
          DO nb=1,num_bands
            read(20,*) x,y,eigvals(nb,nkp)
          ENDDO
        ENDDO
-    endif
 
     lforce=.false.
     inquire(file='wannier90.deig',exist=iffile)

@@ -31,6 +31,9 @@ subroutine Compute_DMFT(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eva
   real(kind=dp) :: tot
 !  integer :: id,nodes
 
+! check if seedname.dat is present
+  call check_seedname() 
+
 !  write(*,*) kpt_dft
 !!
 !!  mpi_comm_world=mpi_comm_world_loc
@@ -91,6 +94,10 @@ subroutine Compute_DMFT_from_amn(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc
 !  call mpi_comm_rank(mpi_comm_world_loc, my_node_id, ierr)
 !  call mpi_comm_size(mpi_comm_world_loc, num_nodes, ierr)
 !  call mpi_allreduce(my_node_id,b,1,mpi_integer_loc,mpi_sum_loc,mpi_comm_world_loc,ierr)
+
+! check if seedname.dat is present
+  call check_seedname() 
+
   call comms_setup_vars
 !  print *, "Hello world", my_node_id, num_nodes
   !call comms_end

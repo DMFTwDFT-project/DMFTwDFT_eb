@@ -450,8 +450,6 @@ if __name__ == "__main__":
 
                 DFT.Read_NBANDS()
                 DFT.Read_EFERMI()
-                DFT.Read_OSZICAR()
-                print ("Total energy = %s eV" % str(DFT.E))
 
                 # Setting num_bands in .win file.
                 # If set to False num_bands is set to number of DFT bands.
@@ -497,10 +495,10 @@ if __name__ == "__main__":
                 print ("\n--- Running siesta ---\n")
 
                 # Renaming wannier90.win files to siesta files.
-                shutil.copy("wannier90.eig", args.structurename + ".eig")
-                shutil.copy("wannier90.amn", args.structurename + ".amn")
-                shutil.copy("wannier90.chk", args.structurename + ".chk")
-                shutil.copy("wannier90.win", args.structurename + ".win")
+                # shutil.copy("wannier90.eig", args.structurename + ".eig")
+                # shutil.copy("wannier90.amn", args.structurename + ".amn")
+                # shutil.copy("wannier90.chk", args.structurename + ".chk")
+                # shutil.copy("wannier90.win", args.structurename + ".win")
 
                 # Copying the .psf and .fdf files from top directory
                 fdfsource = "../" + args.structurename + ".fdf"
@@ -552,8 +550,6 @@ if __name__ == "__main__":
                 # Update Bands and Fermi energy
                 DFT.Read_NBANDS()
                 DFT.Read_EFERMI()
-                DFT.Read_OSZICAR()
-                print ("Total energy = %s eV" % str(DFT.E))
 
                 # Setting num_bands in .win file.
                 # If set to False num_bands is set to number of DFT bands.
@@ -566,15 +562,24 @@ if __name__ == "__main__":
                 else:
                     wanbands = DFT.NBANDS
 
+                # Copying seedname.win to wannier90.win to update bands and fermi.
+                shutil.copy(args.structurename + ".win", "wannier90.win")
+
                 # Updating .win
                 DFT.Update_win(
                     wanbands, DFT.EFERMI + p["ewin"][0], DFT.EFERMI + p["ewin"][1]
                 )
+                # Copying back to seedname.win
                 shutil.copy("wannier90.win", args.structurename + ".win")
 
                 # Running wannier90
                 print os.popen("rm wannier90.chk").read()
                 print os.popen("rm wannier90.chk.fmt").read()
+
+                chk_seedname_rm = "rm " + args.structurename + ".chk"
+                chkfmt_seedname_rm = "rm " + args.structurename + ".chk.fmt"
+                print os.popen(chk_seednamerm_rm).read()
+                print os.popen(chkfmt_seedname_rm).read()
                 main_out.write(
                     "-------------- Running wannier 90 "
                     + str(itt + 1)
@@ -600,10 +605,10 @@ if __name__ == "__main__":
                 print out  # , err
 
                 # Renaming siesta files to wannier90 files
-                shutil.copy(args.structurename + ".eig", "wannier90.eig")
-                shutil.copy(args.structurename + ".chk", "wannier90.chk")
-                shutil.copy(args.structurename + ".win", "wannier90.win")
-                shutil.copy(args.structurename + ".amn", "wannier90.amn")
+                # shutil.copy(args.structurename + ".eig", "wannier90.eig")
+                # shutil.copy(args.structurename + ".chk", "wannier90.chk")
+                # shutil.copy(args.structurename + ".win", "wannier90.win")
+                # shutil.copy(args.structurename + ".amn", "wannier90.amn")
 
     main_out.write("Calculation Ends" + now())
     print ("\nCalculation complete.")

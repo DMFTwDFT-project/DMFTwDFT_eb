@@ -101,10 +101,6 @@ if __name__ == "__main__":
                 "INPUT.py",
                 "para_com.dat",
             ]
-            # dmft_ksum_band looks for wannier90 files.
-            # Renaming is just easier.
-            shutil.copy(str(structurename) + ".chk", "wannier90.chk")
-            shutil.copy(str(structurename) + ".eig", "wannier90.eig")
 
         for i, files in enumerate(bandsfiles):
             if os.path.exists(cpdr + "/" + files):
@@ -113,6 +109,12 @@ if __name__ == "__main__":
             else:
                 print(files + " must exist in a " + cpdr + " directory! Exiting!")
                 sys.exit(1)
+
+            # dmft_ksum_band looks for wannier90 files.
+            # Renaming is just easier.
+            shutil.copy(str(structurename) + ".chk", "wannier90.chk")
+            shutil.copy(str(structurename) + ".eig", "wannier90.eig")
+
         exec(compile(open("INPUT.py", "rb").read(), "INPUT.py", "exec"))
 
     else:

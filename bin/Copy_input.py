@@ -91,8 +91,6 @@ if __name__ == "__main__":
                 "dmft_params.dat",
                 "INPUT.py",
                 "para_com.dat",
-                "SigMdc.out",
-                "SigMdc_dn.out",
             ]
         else:
             bandsfiles = [
@@ -102,9 +100,12 @@ if __name__ == "__main__":
                 "dmft_params.dat",
                 "INPUT.py",
                 "para_com.dat",
-                "SigMdc.out",
-                "SigMdc_dn.out",
             ]
+            # dmft_ksum_band looks for wannier90 files.
+            # Renaming is just easier.
+            shutil.copy(str(structurename) + ".chk", "wannier90.chk")
+            shutil.copy(str(structurename) + ".eig", "wannier90.eig")
+
         for i, files in enumerate(bandsfiles):
             if os.path.exists(cpdr + "/" + files):
                 print("Copying bands file " + files + " to the current directory")
@@ -112,8 +113,6 @@ if __name__ == "__main__":
             else:
                 print(files + " must exist in a " + cpdr + " directory! Exiting!")
                 sys.exit(1)
-        if os.path.exists(cpdr + "/seedname.dat"):
-            shutil.copy2(cpdr + "/seedname.dat", ".")
         exec(compile(open("INPUT.py", "rb").read(), "INPUT.py", "exec"))
 
     else:

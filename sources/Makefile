@@ -21,6 +21,7 @@ lib: objdir
 	(cd $(ROOTDIR)/src/obj && $(MAKE) -f $(REALMAKEFILE) libs)
 
 copy:
+	cp dmft.x dmft0.x
 	cp  *.x ../bin/
 	cp  dmft_ksum/dmft_ksum_band ../bin/
 	cp  dmft_ksum/dmft_ksum_partial_band ../bin/

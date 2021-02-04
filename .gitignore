@@ -9,6 +9,7 @@ libdmft.a
 wannier90.x
 w90chk2chk.x
 dmft.x
+dmft0.x
 dmft_dos.x
 dmft_ksum_band
 dmft_ksum_partial_band

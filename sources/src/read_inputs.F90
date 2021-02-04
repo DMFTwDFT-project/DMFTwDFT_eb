@@ -48,7 +48,7 @@ module read_inputs
   real(kind=dp), save :: mu_DFT
   real(kind=dp), save :: broaden
   logical, save :: have_seedname
-  character(len=10) :: seedname
+  character(len=33) :: seedname
   
 
 contains
@@ -60,8 +60,8 @@ contains
     ! Checking to see if seedname.dat is available
     inquire(file="seedname.dat",exist=have_seedname)
     if (have_seedname .eqv. .true.) then
-        open(unit=20,file='seedname.dat',status='old',form='unformatted')
-        read(20) seedname
+        open(unit=20,file='seedname.dat',status='old',form='formatted')
+        read(20,*) seedname
         close(20)
     endif
 
@@ -240,7 +240,7 @@ contains
 
   subroutine Compute_UNI_from_amn()
     use constants, only: dp, cmplx_0
-    use io, only: io_error, io_file_unit, stdout, seedname
+    use io, only: io_error, io_file_unit, stdout 
     use utility 
 
     implicit none
@@ -308,7 +308,7 @@ contains
 
   subroutine Check_Unitarity()
     use constants, only: dp, cmplx_0
-    use io, only: io_error, io_file_unit, stdout, seedname
+    use io, only: io_error, io_file_unit, stdout
     use utility 
 
     implicit none
@@ -367,7 +367,7 @@ contains
 
   subroutine Print_overlap()
     use constants, only: dp, cmplx_0
-    use io, only: io_error, io_file_unit, stdout, seedname
+    use io, only: io_error, io_file_unit, stdout
     use utility 
 
     implicit none
@@ -423,7 +423,7 @@ contains
 
   subroutine Read_wan_amn()
     use constants, only: dp, cmplx_0
-    use io, only: io_error, io_file_unit, stdout, seedname
+    use io, only: io_error, io_file_unit, stdout
 
     implicit none
 
@@ -477,7 +477,7 @@ contains
 
   subroutine Read_wan_eig()
     use constants, only: dp
-    use io, only: io_error, io_file_unit, stdout, seedname
+    use io, only: io_error, io_file_unit, stdout
 
     implicit none
 

@@ -9,7 +9,7 @@ p = {
     "Ndft": 1,  # Number of DFT iterations
     "Nit": 2,  # Number of DMFT iterations
     "n_tot": 19,  # Number of total electrons
-    "nf": 8.0,  # Number of target Nd
+    "nf": 1.0,  # Number of target Nd
     "nspin": 1,  # Number of total spins
     "atomnames": ["V", "O"],  # The name of atoms
     "orbs": ["d", "p"],  # The name  of orbitals
@@ -47,20 +47,6 @@ pC = {
     "Naver": [80000000, "  # Naver"],
 }
 
-##### VASP parameters ########
-pV = {
-    "System=": ["LaNiO3", "# The name of system"],
-    "ENCUT=": [600.0, "# Energy cutoff"],
-    "ISPIN=": [1, "#ISPIN"],
-    "NBANDS=": [72, "# LMAX"],
-    "LMAXMIX=": [4, "#LMAX"],
-    "NCORE=": [1, "#LMAX"],
-    "IALGO=": [48, "#LMAX"],
-    #      "NELM=":    [20,             "#LMAX"],
-    "ISMEAR=": [-5, "# ISMEAR"],
-    "ADDGRID=": [".TRUE.", "#GGA"],
-    "LWANNIER90=": [".TRUE.", "# ISMEAR"],
-}
 
 ############## CIX parameters ###########
 pD = {

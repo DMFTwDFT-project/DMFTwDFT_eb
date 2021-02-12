@@ -1,6 +1,6 @@
 
 #=============================
-# For Linux with gnu compilers 
+# For Linux with gnu compilers
 #=============================
 F90 = gfortran
 COMMS=mpi
@@ -14,5 +14,5 @@ LDOPTS=-O2
 # Blas and LAPACK
 #=======================
 
-LIBDIR = /usr/local/lib/ 
+LIBDIR = /home/uthpala/lib/
 LIBS = -L$(LIBDIR)  -llapack -lblas

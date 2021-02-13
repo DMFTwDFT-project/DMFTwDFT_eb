@@ -482,8 +482,13 @@ if __name__ == "__main__":
                 out, err = subprocess.Popen(
                     cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
                 ).communicate()
-                print ("wannier90 calculation complete.")
-                print out  # , err
+
+                if os.path.isfile("wannier90.chk"):
+                    print ("wannier90 calculation complete.")
+                    print out  # , err
+                else:
+                    print ("wannier90 calculation failed! Exiting.")
+                    sys.exit()
 
             elif args.dft == "siesta":
 
@@ -598,8 +603,13 @@ if __name__ == "__main__":
                 out, err = subprocess.Popen(
                     cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
                 ).communicate()
-                print ("wannier90 calculation complete.")
-                print out  # , err
+
+                if os.path.isfile(args.structurename + ".chk"):
+                    print ("wannier90 calculation complete.")
+                    print out  # , err
+                else:
+                    print ("wannier90 calculation failed! Exiting.")
+                    sys.exit()
 
                 # Renaming siesta files to wannier90 files
                 # shutil.copy(args.structurename + ".eig", "wannier90.eig")

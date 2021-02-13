@@ -448,9 +448,7 @@ contains
             STOP
         else
             open(unit=30,file=trim(seedname)//'.amn',status='old',form='formatted')
-        endif
-    else
-        inquire(file='wannier90.amn',exist=iffile)
+        endif inquire(file='wannier90.amn',exist=iffile)
         if (iffile.eqv. .false.) then
             write(*,*) 'wannier90.amn must be present!!'
             STOP

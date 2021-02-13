@@ -468,7 +468,6 @@ if __name__ == "__main__":
                 )
 
                 print os.popen("rm wannier90.chk").read()
-                print os.popen("rm wannier90.chk.fmt").read()
                 main_out.write(
                     "-------------- Running wannier 90 "
                     + str(itt + 1)
@@ -574,10 +573,8 @@ if __name__ == "__main__":
 
                 # Running wannier90
                 print os.popen("rm wannier90.chk").read()
-                print os.popen("rm wannier90.chk.fmt").read()
-
                 chk_seedname_rm = "rm " + args.structurename + ".chk"
-                chkfmt_seedname_rm = "rm " + args.structurename + ".chk.fmt"
+
                 print os.popen(chk_seedname_rm).read()
                 print os.popen(chkfmt_seedname_rm).read()
                 main_out.write(

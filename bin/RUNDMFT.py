@@ -577,11 +577,9 @@ if __name__ == "__main__":
                 shutil.copy("wannier90.win", args.structurename + ".win")
 
                 # Running wannier90
-                print os.popen("rm wannier90.chk").read()
                 chk_seedname_rm = "rm " + args.structurename + ".chk"
-
                 print os.popen(chk_seedname_rm).read()
-                print os.popen(chkfmt_seedname_rm).read()
+
                 main_out.write(
                     "-------------- Running wannier 90 "
                     + str(itt + 1)

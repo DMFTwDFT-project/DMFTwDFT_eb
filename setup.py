@@ -84,7 +84,6 @@ def main(args):
         "libdmft.a",
         "./dmft_ksum/dmft_ksum_band",
         "./dmft_ksum/dmft_ksum_partial_band",
-        "./fort_kpt_tools/fort_kpt_tools.so",
     ]
 
     result_array = []

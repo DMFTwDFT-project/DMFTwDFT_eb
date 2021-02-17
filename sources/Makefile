@@ -12,7 +12,7 @@ default: all
 
 DMFTwDFT: objdir
 	(cd $(ROOTDIR)/src/obj && $(MAKE) -f $(REALMAKEFILE) dmft)
-	(cd $(ROOTDIR)/fort_kpt_tools && $(MAKE) -f $(FORTKPTTOOLSMAKEFILE) fort_kpt_tools.so )
+#	(cd $(ROOTDIR)/fort_kpt_tools && $(MAKE) -f $(FORTKPTTOOLSMAKEFILE) fort_kpt_tools.so )
 	(cd $(ROOTDIR)/dmft_ksum && $(MAKE) -f $(DMFTKSUMMAKEFILE) all )
 
 dos: objdir
@@ -25,7 +25,7 @@ copy:
 	cp  *.x ../bin/
 	cp  dmft_ksum/dmft_ksum_band ../bin/
 	cp  dmft_ksum/dmft_ksum_partial_band ../bin/
-	cp  fort_kpt_tools/fort_kpt_tools.so ../bin/
+#	cp  fort_kpt_tools/fort_kpt_tools.so ../bin/
 
 clean:
 	rm -f *.x

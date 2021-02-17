@@ -27,8 +27,7 @@ C++ = icpc
 CC  = icc
 
 OPENMP = -fopenmp
-FFLAGSEXTRA = -fallow-argument-mismatch
-FFLAGS = -O2  -free -no-prec-div -pc80 $(OPENMP) $(FFLAGSEXTRA)
+FFLAGS = -O2  -free -no-prec-div -pc80 $(OPENMP)
 OFLAGS = -O2
 
 LALIB  =  -mkl

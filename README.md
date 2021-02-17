@@ -6,7 +6,7 @@ DMFTwDFT
 NOTE: This version supports excluded_bands from the wannier90 inputs.
 
 DMFTwDFT is an open-source, user-friendly framework to calculate electronic, vibrational and elastic properties in strongly
-correlated materials (SCM) using beyond-DFT methods such as DFT+U, DFT+Hybrids and DFT+DMFT (Dynamical Mean Field Theory) with a variety of different DFT codes. Currently supports VASP, Siesta and Quantum Espresso (through Aiida).
+correlated materials (SCM) using beyond-DFT methods such as DFT+U, DFT+Hybrids and DFT+DMFT (Dynamical Mean Field Theory) with a variety of different DFT codes. Currently supports VASP, Siesta and Quantum Espresso.
 
 ### Features <br />
 ![](docs/images/welcome.jpg)
@@ -32,7 +32,7 @@ Copy Makefile.in from the ``config`` directory for the desired compiler to the D
 
 Note:
 
-For gnu compilers, it is assumed that liblapack.a and libblas.a are installed in the ``/usr/local/bin/`` directory. If not, modify **gfortran.make.inc** in the ``src`` directory to point to the correct location.
+For gnu compilers, it is assumed that liblapack.a, libblas.a and gsl libraries are installed in the ``/usr/local/lib/`` directory. If not, modify ``LALIB`` and ``GSLLIB`` in Makefile.in to point to the correct location. Additionally, set compiler flags in ``FFLAGSEXTRA``.
 
 Developers
 -----------
@@ -54,17 +54,21 @@ How to cite
 
 If you have used DMFTwDFT in your work, please cite:
 
-[arXiv:2002.00068 [cond-mat.str-el]](https://arxiv.org/abs/2002.00068)
+[10.1016/j.cpc.2020.107778](https://www.sciencedirect.com/science/article/abs/pii/S001046552030388X)
 
 BibTex:
 
-     @misc{singh2020dmftwdft,
-    title={DMFTwDFT: An open-source code combining Dynamical Mean Field Theory with various Density Functional Theory packages},
-    author={Vijay Singh and Uthpala Herath and Benny Wah and Xingyu Liao and Aldo H. Romero and Hyowon Park},
-    year={2020},
-    eprint={2002.00068},
-    archivePrefix={arXiv},
-    primaryClass={cond-mat.str-el}
+    @article{SINGH2021107778,
+    title = "DMFTwDFT: An open-source code combining Dynamical Mean Field Theory with various density functional theory packages",
+    journal = "Computer Physics Communications",
+    volume = "261",
+    pages = "107778",
+    year = "2021",
+    issn = "0010-4655",
+    doi = "https://doi.org/10.1016/j.cpc.2020.107778",
+    url = "http://www.sciencedirect.com/science/article/pii/S001046552030388X",
+    author = "Vijay Singh and Uthpala Herath and Benny Wah and Xingyu Liao and Aldo H. Romero and Hyowon Park",
+    keywords = "DFT, DMFT, Strongly correlated materials, Python, Condensed matter physics, Many-body physics",
     }
 
 Thank you. 
@@ -106,6 +110,7 @@ For the Python 2 version this is not required.
 
 Changes
 -------
+v1.2 Jan 13th, 2020 - Fixed bug with exponentially large numbers in UNI_mat.dat for SCF calculations. <br />
 v1.1 May 11th, 2020 - Added support for Quantum Espresso through Aiida. <br />
 v1.0 April 23, 2020 - Cleaned repository. Defaulted to Python 2.x version. <br />
 v0.3 November 25, 2019 - Added DMFT.py and postDMFT.py scripts <br />

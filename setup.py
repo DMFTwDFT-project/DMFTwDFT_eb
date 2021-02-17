@@ -61,7 +61,10 @@ def main(args):
         libs = "LIBS += " + str(lalib[0])
 
         fflags = findall(r"FFLAGSEXTRA\s*=\s*([-_.a-zA-Z0-9\s\/]*)\n", data)
-        fcopts = "FCOPTS += " + str(fflags[0])
+        if len(fflags) > 0:
+            fcopts = "FCOPTS += " + str(fflags[0])
+        else:
+            fcopts = ""
 
         fo = open("./sources/make.inc", "a")
         fo.write(libs + "\n")

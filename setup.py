@@ -57,10 +57,10 @@ def main(args):
         fp.close()
 
         # Appending LALIBS as LIBS in make.inc
-        lalib = findall(r"LALIB\s*=\s*([-_.a-zA-Z0-9\s\/]*)\n", data)
+        lalib = findall(r"LALIB\s*=\s*([-_.a-zA-Z0-9\s\/]*)(?:\n|#)", data)
         libs = "LIBS += " + str(lalib[0])
 
-        fflags = findall(r"FFLAGSEXTRA\s*=\s*([-_.a-zA-Z0-9\s\/]*)\n", data)
+        fflags = findall(r"FFLAGSEXTRA\s*=\s*([-_.a-zA-Z0-9\s\/]*)(?:\n|#)", data)
         if len(fflags) > 0:
             fcopts = "FCOPTS += " + str(fflags[0])
         else:

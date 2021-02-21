@@ -2677,7 +2677,6 @@
            !write(*,*) 'hi'
            !CALL Compute_DMFT(KPOINTS_FULL%NKPTS,num_wann_,KPOINTS_FULL%VKPT,KPOINTS_FULL%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
            !write(*,*) 'hi2'
-           write(*,*) "Computing DMFT..."
            CALL Compute_DMFT(WDES%NKPTS,num_wannier,WDES%VKPT,WDES%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
 
             ! Print the eigen values for the wannier manifold for each

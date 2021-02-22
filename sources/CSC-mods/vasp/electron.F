@@ -152,6 +152,7 @@
       COMPLEX(q),allocatable :: WaveW(:,:,:),WaveW_tot(:,:,:)
       COMPLEX(q),allocatable :: WProj(:,:,:),WProj_tot(:,:,:)
       REAL(q),allocatable :: FERWE(:,:)
+      INTEGER num_wannier
 
       IONODE=0
       NODE_ME=0
@@ -678,6 +679,8 @@
       !WRITE_MMN_AMN=.FALSE.
       !if (LDMFT.eq..TRUE..AND. MOD(N,4).eq.0) then
       if (LDMFT.eq..TRUE.) then
+
+        CALL ParseWannier90(num_wannier)
         CALL MLWF_WANNIER90_AMN(WDES,W,P,CQIJ,T_INFO,LATT_CUR,INFO,IO)
         !CALL MLWF_WANNIER90(WDES,W,P,CQIJ,T_INFO,LATT_CUR,INFO,IO)
 !      else

@@ -392,8 +392,6 @@
       REAL(q),allocatable :: FERWE(:,:)
 
       integer eig_i,eig_k,num_wannier
-      real(q) DMFT_eval_norm
-
 
       INTERFACE
         subroutine Compute_DMFT(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eval,DMFT_evec)
@@ -2671,15 +2669,16 @@
            !allocate(DMFT_eval_(28,KPOINTS_FULL%NKPTS))
            !allocate(DMFT_evec_(28,28,KPOINTS_FULL%NKPTS))
            !allocate(band_win_(2,KPOINTS_FULL%NKPTS))
-           allocate(DMFT_eval_(num_wann_,WDES%NKPTS))
-           allocate(DMFT_evec_(num_wann_,num_wann_,WDES%NKPTS))
+           allocate(DMFT_eval_(num_wannier,WDES%NKPTS))
+           allocate(DMFT_evec_(num_wannier,num_wannier,WDES%NKPTS))
            allocate(band_win_(2,WDES%NKPTS))
            !CALL MLWF_WANNIER90_AMN(WDES,W,P,CQIJ,T_INFO,LATT_CUR,INFO,IO)
            !CALL MPI_barrier( WDES%COMM%MPI_COMM, ierr )
            !write(*,*) 'hi'
            !CALL Compute_DMFT(KPOINTS_FULL%NKPTS,num_wann_,KPOINTS_FULL%VKPT,KPOINTS_FULL%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
            !write(*,*) 'hi2'
-           CALL Compute_DMFT(WDES%NKPTS,num_wann_,WDES%VKPT,WDES%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
+           !write(*,*) "Computing DMFT..."
+           CALL Compute_DMFT(WDES%NKPTS,num_wannier,WDES%VKPT,WDES%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
 
             ! Print the eigen values for the wannier manifold for each
             ! k-point
@@ -2689,7 +2688,7 @@
             open(1, file = 'dmft-nkij_eig_vasp.dat',status="REPLACE")
             write(1,*) "k, wk, band, n_kij_eig"
             do eig_k=1,WDES%NKPTS
-                do eig_i=1,num_wann_
+                do eig_i=1,num_wannier
                     ! Normalization
                     DMFT_eval_norm = W%WDES%RSPIN*WDES%WTKPT(eig_k)*DMFT_eval_(eig_i,eig_k)
                     write(1,"(i8,f10.4,i8,f10.4)") eig_k,WDES%WTKPT(eig_k),eig_i,DMFT_eval_norm

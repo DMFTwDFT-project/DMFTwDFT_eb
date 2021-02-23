@@ -45,6 +45,8 @@
       complex*16,allocatable:: UOPTU(:,:), UOPTU2(:,:)
       complex*16,allocatable:: DMFT_M(:,:)
       complex*16,allocatable:: DMFT_U(:),t_DMFT_U(:)
+      ! Updates to read non-disentangled bands
+      integer :: N, ii, ikk
 
       call MPI_init(ierr)
       call MPI_Comm_size(MPI_Comm_World, size, ierr)
@@ -199,7 +201,7 @@
          read(20) num_kpts                ! K-points
          read(20) (mp_grid(i),i=1,3)         ! M-P grid
          allocate(kpt_latt(3,num_kpts))
-         read(20) ((kpt_latt(i,nkp),i=1,3),nkp=1,num_kpts)
+         read(20) ((kpt_latt(i,nkp),i=2,3),nkp=1,num_kpts)
          read(20) nntot                ! nntot
          read(20) num_wann                ! num_wann
          !if
@@ -219,7 +221,16 @@
      1               j=1,num_wann),nkp=1,num_kpts)
          else
             write(*,*) 'No U_matrix_opt ? Probably set identity'
-            STOP
+            allocate(u_matrix_opt(num_bands,num_wann,num_kpts))
+            write(*,*) num_bands, num_wann, num_kpts
+            u_matrix_opt = (0.0, 0.0)
+            N = num_bands
+            DO ikk=1,num_kpts
+                DO ii=1,N
+                    u_matrix_opt(ii,ii,ikk) = 1
+                ENDDO
+            ENDDO
+            !STOP
          endif
          ! U_matrix
          allocate(u_matrix(num_wann,num_wann,num_kpts))

@@ -201,7 +201,7 @@
          read(20) num_kpts                ! K-points
          read(20) (mp_grid(i),i=1,3)         ! M-P grid
          allocate(kpt_latt(3,num_kpts))
-         read(20) ((kpt_latt(i,nkp),i=2,3),nkp=1,num_kpts)
+         read(20) ((kpt_latt(i,nkp),i=1,3),nkp=1,num_kpts)
          read(20) nntot                ! nntot
          read(20) num_wann                ! num_wann
          !if

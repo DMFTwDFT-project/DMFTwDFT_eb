@@ -81,7 +81,7 @@ contains
     integer :: num_exclude_bands,  nntot
 
     integer :: num_band_max, nbmin, nbmax, ierr
-    !real(kind=dp) :: real_latt(3,3), recip_latt(3,3),
+    real(kind=dp) :: real_latt(3,3), recip_latt(3,3)
     real(kind=dp) :: sweight, omega_invariant
     integer :: i,j,k, nb, nbb, IP, IPP, JJ, KK, nkp
     logical,allocatable:: lwindow(:,:), lexclude_band(:)
@@ -205,14 +205,16 @@ contains
     endif
     num_band_max=1
     DO nkp=1,num_kpts
-      IP=0;IPP=0;nbmin=num_bands;nbmax=1;
+      IP=0;IPP=0;nbmin=num_tot_bands;nbmax=1;
       DO nb=1,num_tot_bands
         IF (lexclude_band(nb)) CYCLE
         IP=IP+1
         IF (.NOT.lwindow(IP,nkp)) CYCLE
         IPP=IPP+1
-        IF (IP<nbmin) nbmin=IP
-        IF (IP>nbmax) nbmax=IP
+        ! IF (IP<nbmin) nbmin=IP
+        ! IF (IP>nbmax) nbmax=IP
+        IF (nb<nbmin) nbmin=nb
+        IF (nb>nbmax) nbmax=nb
       ENDDO
       band_win(1,nkp)=nbmin;band_win(2,nkp)=nbmax
       IF (num_band_max<nbmax-nbmin+1) num_band_max=nbmax-nbmin+1
@@ -278,6 +280,7 @@ contains
     DO nkp=1,num_kpts
       nbmin=band_win(1,nkp); nbmax=band_win(2,nkp)
       num_band_max=nbmax-nbmin+1
+      num_band_max=num_wann
       if (.not. allocated(UNI_loc)) then
         allocate (UNI_loc(num_band_max,num_wann), stat=ierr)
         if (ierr /= 0) call io_error('Error allocating Overlap in Print_overlap')
@@ -286,7 +289,8 @@ contains
       allocate(cz(num_band_max,num_band_max))
       allocate(cvdag(num_wann,num_wann))
 
-      call SVD(amn_mat(nbmin:nbmax,:,nkp),num_band_max,num_wann,evalue,cz,cvdag)
+      !call SVD(amn_mat(nbmin:nbmax,:,nkp),num_band_max,num_wann,evalue,cz,cvdag)
+      call SVD(amn_mat(nbmin:nbmin+num_wann-1,:,nkp),num_band_max,num_wann,evalue,cz,cvdag)
       !UNI_loc=0.0_dp
 
       UNI_loc=cmplx_0
@@ -350,9 +354,10 @@ contains
           enddo
         enddo
       enddo
-      Overlap=MATMUL(TRANSPOSE(CONJG(UMatrix(:,:,nkp))),UMatrix(:,:,nkp))
+      !Overlap=MATMUL(TRANSPOSE(CONJG(UMatrix(:,:,nkp))),UMatrix(:,:,nkp))
       !Overlap=MATMUL(TRANSPOSE(CONJG(UNI_loc)),UNI_loc)
       !Overlap=MATMUL(UNI_loc,TRANSPOSE(CONJG(UNI_loc)))
+      Overlap=MATMUL(UNI_loc,TRANSPOSE(CONJG(UNI_loc)))
       deallocate(evalue,cz,cvdag,UNI_loc)
       WRITE(90,*) 'nkp=', nkp
       DO N=1,num_wann
@@ -387,7 +392,8 @@ contains
     DO nkp=1,num_kpts
       Overlap=cmplx_0;
       nbmin=band_win(1,nkp); nbmax=band_win(2,nkp)
-      num_band_max=nbmax-nbmin+1
+      !num_band_max=nbmax-nbmin+1
+      num_band_max=num_wann
       if (.not. allocated(UNI_loc)) then
         allocate (UNI_loc(num_band_max,num_wann), stat=ierr)
         if (ierr /= 0) call io_error('Error allocating Overlap in Print_overlap')
@@ -396,7 +402,8 @@ contains
       allocate(evalue(num_wann))
       allocate(cz(num_band_max,num_band_max))
       allocate(cvdag(num_wann,num_wann))
-      call SVD(amn_mat(nbmin:nbmax,:,nkp),num_band_max,num_wann,evalue,cz,cvdag)
+      !call SVD(amn_mat(nbmin:nbmax,:,nkp),num_band_max,num_wann,evalue,cz,cvdag)
+      call SVD(amn_mat(nbmin:nbmin+num_wann-1,:,nkp),num_band_max,num_wann,evalue,cz,cvdag)
       UNI_loc=0.0_dp
       do N=1,num_band_max
         do M=1,num_wann
@@ -434,12 +441,12 @@ contains
     real(kind=dp) :: A_re, A_im
 
     if (.not. allocated(amn_mat)) then
-      allocate (amn_mat(num_bands,num_wann,num_kpts), stat=ierr)
+      allocate (amn_mat(num_tot_bands,num_wann,num_kpts), stat=ierr)
       if (ierr /= 0) call io_error('Error allocating amn_mat in Read_wan_amn')
     endif
 
     amn_mat=cmplx_0
-    !write(*,*) num_kpts,num_wann,num_bands
+    !write(*,*) num_kpts,num_wann,num_tot_bands
 
     if (have_seedname .eqv. .true.) then
         inquire(file=trim(seedname)//'.amn',exist=iffile)
@@ -463,7 +470,7 @@ contains
        read(30,*) header
        do i=1,num_kpts
          do j=1,num_wann
-           do k=1,num_bands
+           do k=1,num_tot_bands
              read(30,*) idx1,idx2,idx3,A_re,A_im
              !write(*,*) A_re, A_im
              amn_mat(k,j,i)=dcmplx(A_re,A_im)
@@ -486,7 +493,7 @@ contains
     integer :: x,y,nkp,nb,ierr
 
     if (.not. allocated(eigvals)) then
-      allocate (eigvals(num_bands,num_kpts), stat=ierr)
+      allocate (eigvals(num_tot_bands,num_kpts), stat=ierr)
       if (ierr /= 0) call io_error('Error allocating UMatrix in Read_wan_chk')
     endif
 
@@ -520,7 +527,7 @@ contains
     endif
 
        DO nkp=1,num_kpts
-         DO nb=1,num_bands
+         DO nb=1,num_tot_bands
            read(20,*) x,y,eigvals(nb,nkp)
          ENDDO
        ENDDO
@@ -530,7 +537,7 @@ contains
     if (iffile.eqv..true.) lforce=.true.
     if (lforce.eqv..true.) then
       if (.not. allocated(deig)) then
-        allocate (deig(num_bands,num_kpts), stat=ierr)
+        allocate (deig(num_tot_bands,num_kpts), stat=ierr)
         if (ierr /= 0) call io_error('Error allocating deig in Read_wan_win')
       endif
 
@@ -541,7 +548,7 @@ contains
       else
          open(unit=20,file='wannier90.deig',status='old',form='formatted')
          DO nkp=1,num_kpts
-           DO nb=1,num_bands
+           DO nb=1,num_tot_bands
              read(20,*) x,y,deig(nb,nkp)
            ENDDO
          ENDDO

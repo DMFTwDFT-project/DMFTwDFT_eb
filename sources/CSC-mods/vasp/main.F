@@ -382,46 +382,43 @@
       COMMON /BEEFENS/ LBEEFCALCBASIS,LBEEFBAS
 #endif
 
-      ! These are declared in mlwf.F
       !integer, parameter :: dp = kind(1.0d0)
-      ! integer, allocatable :: band_win_(:,:)
-      ! real(q),allocatable :: DMFT_eval_(:,:)
-      ! complex(q),allocatable :: DMFT_evec_(:,:,:)
+      !real(kind=dp),allocatable :: DMFT_eval_(:,:)
+      !complex(kind=dp),allocatable :: DMFT_evec_(:,:,:)
       INTEGER NB, NK, NP, NBG
       REAL(q) tot_n
       COMPLEX(q),allocatable :: WaveW(:,:,:),WaveW_tot(:,:,:)
       COMPLEX(q),allocatable :: WProj(:,:,:),WProj_tot(:,:,:)
       REAL(q),allocatable :: FERWE(:,:)
 
-      integer eig_i,eig_k
-      REAL(q) DMFT_eval_norm
+      integer eig_i,eig_k,num_wannier
 
-      !INTERFACE
-      !  subroutine Compute_DMFT(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eval,DMFT_evec)
+      INTERFACE
+        subroutine Compute_DMFT(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eval,DMFT_evec)
 
-      !  implicit none
-      !  !integer, intent(in) :: mpi_comm_world,mpi_sum,mpi_integer
-      !  integer, parameter :: dp = kind(1.0d0)
-      !  integer, intent(in) :: n_kpts_loc,n_wann
-      !  real(kind=dp), intent(in) :: kpt_dft(3,n_kpts_loc)
-      !  real(kind=dp), intent(in) :: wght_dft(n_kpts_loc)
-      !  integer, intent(out) :: band_win_loc(2,n_kpts_loc)
-      !  real(kind=dp), intent(out) :: DMFT_eval(n_wann,n_kpts_loc)
-      !  complex(kind=dp), intent(out) :: DMFT_evec(n_wann,n_wann,n_kpts_loc)
-      !  end subroutine
-      !  subroutine Compute_DMFT_from_amn(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eval,DMFT_evec)
+        implicit none
+        !integer, intent(in) :: mpi_comm_world,mpi_sum,mpi_integer
+        integer, parameter :: dp = kind(1.0d0)
+        integer, intent(in) :: n_kpts_loc,n_wann
+        real(kind=dp), intent(in) :: kpt_dft(3,n_kpts_loc)
+        real(kind=dp), intent(in) :: wght_dft(n_kpts_loc)
+        integer, intent(out) :: band_win_loc(2,n_kpts_loc)
+        real(kind=dp), intent(out) :: DMFT_eval(n_wann,n_kpts_loc)
+        complex(kind=dp), intent(out) :: DMFT_evec(n_wann,n_wann,n_kpts_loc)
+        end subroutine
+        subroutine Compute_DMFT_from_amn(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eval,DMFT_evec)
 
-      !  implicit none
-      !  !integer, intent(in) :: mpi_comm_world,mpi_sum,mpi_integer
-      !  integer, parameter :: dp = kind(1.0d0)
-      !  integer, intent(in) :: n_kpts_loc,n_wann
-      !  real(kind=dp), intent(in) :: kpt_dft(3,n_kpts_loc)
-      !  real(kind=dp), intent(in) :: wght_dft(n_kpts_loc)
-      !  integer, intent(out) :: band_win_loc(2,n_kpts_loc)
-      !  real(kind=dp), intent(out) :: DMFT_eval(n_wann,n_kpts_loc)
-      !  complex(kind=dp), intent(out) :: DMFT_evec(n_wann,n_wann,n_kpts_loc)
-      !  end subroutine
-      !END INTERFACE
+        implicit none
+        !integer, intent(in) :: mpi_comm_world,mpi_sum,mpi_integer
+        integer, parameter :: dp = kind(1.0d0)
+        integer, intent(in) :: n_kpts_loc,n_wann
+        real(kind=dp), intent(in) :: kpt_dft(3,n_kpts_loc)
+        real(kind=dp), intent(in) :: wght_dft(n_kpts_loc)
+        integer, intent(out) :: band_win_loc(2,n_kpts_loc)
+        real(kind=dp), intent(out) :: DMFT_eval(n_wann,n_kpts_loc)
+        complex(kind=dp), intent(out) :: DMFT_evec(n_wann,n_wann,n_kpts_loc)
+        end subroutine
+      END INTERFACE
 
 #ifdef PROFILING
 !=======================================================================
@@ -2663,21 +2660,19 @@
                 WRITE(TIU0,*)'DFT+DMFT run with DMFTwDFT'
 
 
-           CALL ParseWannier90(num_wann_)
+           num_wannier=0
+           CALL ParseWannier90(num_wannier)
 
 
            CALL CHECK_FULL_KPOINTS
            !num_wann_=14
+           num_wann_ = num_wannier
            !allocate(DMFT_eval_(28,KPOINTS_FULL%NKPTS))
            !allocate(DMFT_evec_(28,28,KPOINTS_FULL%NKPTS))
            !allocate(band_win_(2,KPOINTS_FULL%NKPTS))
            allocate(DMFT_eval_(num_wann_,WDES%NKPTS))
            allocate(DMFT_evec_(num_wann_,num_wann_,WDES%NKPTS))
            allocate(band_win_(2,WDES%NKPTS))
-
-           DMFT_eval_ = 0.0_dp
-           DMFT_evec_ = (0.0_dp,0.0_dp)
-           band_win_ = 0
            !CALL MLWF_WANNIER90_AMN(WDES,W,P,CQIJ,T_INFO,LATT_CUR,INFO,IO)
            !CALL MPI_barrier( WDES%COMM%MPI_COMM, ierr )
            !write(*,*) 'hi'
@@ -2691,7 +2686,6 @@
 
 !            write(*,*) "RSPIN: "
 !            write(*,*) W%WDES%RSPIN
-            DMFT_eval_norm = 0.0_dp
             open(1, file = 'dmft-nkij_eig_vasp.dat',status="REPLACE")
             write(1,*) "k, wk, band, n_kij_eig"
             do eig_k=1,WDES%NKPTS
@@ -4891,16 +4885,6 @@ ibrion: IF (DYN%IBRION==0) THEN
       ENDIF
 #endif
       CALLMPI_C(M_exit())
-
-      ! if(allocated(DMFT_eval_)) then
-      !   deallocate(DMFT_eval)
-      ! endif
-      ! if(allocated(DMFT_evec_)) then
-      !   deallocate(DMFT_evec_)
-      ! endif
-      ! if(allocated(band_win_)) then
-      !   deallocate(band_win_)
-      ! endif
 
       CONTAINS
 

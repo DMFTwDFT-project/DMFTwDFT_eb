@@ -387,14 +387,12 @@ contains
       mul_fac=0.0_dp
       !write(*,*) Ed
       !do ib=1,num_wann
-      do ispin=1,nspin
-        do i=1,n_atoms
-          do j=1,n_orbs
-            if (sym_idx(ispin,i,j)>0) then
-              sym_Ed(sym_idx(ispin,i,j))=sym_Ed(sym_idx(ispin,i,j))+Ed((i-1)*n_orbs+j)!real(HamR((nR+1)/2,ib,ib))
-              mul_fac(sym_idx(ispin,i,j))=mul_fac(sym_idx(ispin,i,j))+1.0_dp
-            endif
-          enddo
+      do i=1,n_atoms
+        do j=1,n_orbs
+          if (sym_idx(1,i,j)>0) then
+            sym_Ed(sym_idx(1,i,j))=sym_Ed(sym_idx(1,i,j))+Ed((i-1)*n_orbs+j)!real(HamR((nR+1)/2,ib,ib))
+            mul_fac(sym_idx(1,i,j))=mul_fac(sym_idx(1,i,j))+1.0_dp
+          endif
         enddo
       enddo
       do ib=1,ncor_orb
@@ -678,7 +676,7 @@ contains
     do i=1,num_wann
       tot_n=tot_n+dm(i)
     enddo
-!   call comms_barrier
+    call comms_barrier
 
     !if (on_root) write(*,*) tot_n,Gloc(1,1,1), Ekin, Ed, dm, mom
 
@@ -716,14 +714,12 @@ contains
       mul_fac=0.0_dp
       !write(*,*) Ed
       !do ib=1,num_wann
-      do ispin=1,nspin
-        do i=1,n_atoms
-          do j=1,n_orbs
-            if (sym_idx(ispin,i,j)>0) then
-              sym_Ed(sym_idx(ispin,i,j))=sym_Ed(sym_idx(ispin,i,j))+Ed((i-1)*n_orbs+j)!real(HamR((nR+1)/2,ib,ib))
-              mul_fac(sym_idx(ispin,i,j))=mul_fac(sym_idx(ispin,i,j))+1.0_dp
-            endif
-          enddo
+      do i=1,n_atoms
+        do j=1,n_orbs
+          if (sym_idx(1,i,j)>0) then
+            sym_Ed(sym_idx(1,i,j))=sym_Ed(sym_idx(1,i,j))+Ed((i-1)*n_orbs+j)!real(HamR((nR+1)/2,ib,ib))
+            mul_fac(sym_idx(1,i,j))=mul_fac(sym_idx(1,i,j))+1.0_dp
+          endif
         enddo
       enddo
       do ib=1,ncor_orb

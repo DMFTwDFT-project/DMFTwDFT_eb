@@ -153,6 +153,9 @@
       COMPLEX(q),allocatable :: WProj(:,:,:),WProj_tot(:,:,:)
       REAL(q),allocatable :: FERWE(:,:)
 
+      INTEGER :: eig_i, eig_k
+      REAL(q) :: DMFT_eval_norm
+
       IONODE=0
       NODE_ME=0
 #ifdef MPI
@@ -687,8 +690,20 @@
         !STOP
         !CALL Compute_DMFT_from_amn(KPOINTS_FULL%NKPTS,num_wann_,KPOINTS_FULL%VKPT,KPOINTS_FULL%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
         !write(*,*) "Computing DMFT from AMN..."
-        !write(*,'(A,I4)') "num_wann_:", num_wann_
         CALL Compute_DMFT_from_amn(WDES%NKPTS,num_wann_,WDES%VKPT,WDES%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
+
+
+        open(2, file = 'dmft-nkij_eig_amn_vasp.dat',status="REPLACE")
+        write(2,*) "k, wk, band, n_kij_eig"
+        do eig_k=1,WDES%NKPTS
+            do eig_i=1,num_wann_
+                ! Normalization
+                DMFT_eval_norm = W%WDES%RSPIN*WDES%WTKPT(eig_k)*DMFT_eval_(eig_i,eig_k)
+                write(2,"(i8,f10.4,i8,f10.4)") eig_k,WDES%WTKPT(eig_k),eig_i,DMFT_eval_norm
+            enddo
+        enddo
+        close(2)
+
         !CALL Compute_DMFT(WDES%NKPTS,num_wann_,WDES%VKPT,WDES%WTKPT,band_win_,DMFT_eval_,DMFT_evec_)
         !IF (IO%IU6>=0) then
         !  DO IK=1,WDES%NKPTS

@@ -3,7 +3,7 @@ include ../make.inc
 F77 = $(MPIF90)
 PFLAGS = -D_MPI -DMPICH_IGNORE_CXX_SEEK
 CFLAGS = $(PFLAGS) -O3 -DAS -xSSE4.2
-FFLAGS = -O2 #-traceback -g -check all -debug all #-xhost
+FFLAGS = -O2 #-xhost
 
 #PLIBS=-L$(MKLROOT)/lib/intel64/ \
     -Wl,--start-group \

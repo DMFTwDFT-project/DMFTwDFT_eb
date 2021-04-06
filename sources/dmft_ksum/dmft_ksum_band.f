@@ -208,6 +208,7 @@
          read(20) checkpoint             ! checkpoint
          read(20) have_disentangled      ! whether a disentanglement has been performed
          if (have_disentangled) then
+            write(*,*) 'distangled bands detected.'
             read(20) omega_invariant     ! omega invariant
          ! lwindow
             allocate(lwindow(num_bands,num_kpts))
@@ -220,23 +221,51 @@
             read(20) (((u_matrix_opt(i,j,nkp),i=1,num_bands),
      1               j=1,num_wann),nkp=1,num_kpts)
          else
-            write(*,*) 'No U_matrix_opt ? Probably set identity'
-            allocate(u_matrix_opt(num_bands,num_wann,num_kpts))
-            write(*,*) num_bands, num_wann, num_kpts
-            u_matrix_opt = (0.0, 0.0)
-            N = num_bands
-            DO ikk=1,num_kpts
-                DO ii=1,N
-                    u_matrix_opt(ii,ii,ikk) = 1
-                ENDDO
-            ENDDO
+            write(*,*) 'no distangled bands detected.'
+             if (.not. allocated(lwindow)) then
+                 allocate (lwindow(num_bands, num_kpts), stat=ierr)
+                 if (ierr /= 0) write (*,*) 'Error allocating lwindow
+     &             in Read_wan_chk'
+            endif
+            if (.not. allocated(u_matrix_opt)) then
+                allocate (u_matrix_opt(num_bands,num_wann,num_kpts)
+     &             ,stat=ierr)
+                if (ierr /= 0) write (*,*) 'Error allocating
+     &               u_matrix_opt in Read_wan_chk'
+            endif
+            do nkp=1,num_kpts
+                do j=1, num_bands
+                    lwindow(j,nkp)=.TRUE.
+                    do i=1, num_wann
+                        if (i.eq.j) u_matrix_opt(j,i,nkp)=1.0
+                    enddo
+                enddo
+            enddo
+        endif ! end 'have_disentangled' if block
+
+            ! write(*,*) 'No U_matrix_opt ? Probably set identity'
+            ! allocate(u_matrix_opt(num_bands,num_wann,num_kpts))
+            ! allocate(lwindow(num_bands,num_kpts))
+            ! write(*,*) num_bands, num_wann, num_kpts
+            ! u_matrix_opt = (0.0, 0.0)
+            ! N = num_bands
+            ! DO ikk=1,num_kpts
+            !     DO ii=1,N
+            !         u_matrix_opt(ii,ii,ikk) = 1
+            !     ENDDO
+            ! ENDDO
             !STOP
-         endif
-         ! U_matrix
-         allocate(u_matrix(num_wann,num_wann,num_kpts))
-         read(20) (((u_matrix(i,j,k),i=1,num_wann),j=1,num_wann)
-     1            ,k=1,num_kpts)
-         close(20)
+
+        ! U_matrix
+        if (.not. allocated(u_matrix)) then
+            allocate (u_matrix(num_wann,num_wann,num_kpts),
+     &        stat=ierr)
+            if (ierr /= 0) write (*,*) 'Error allocating
+     &       u_matrix in Read_wan_chk'
+        endif
+        read(20) (((u_matrix(i,j,k),
+     &       i=1,num_wann),j=1,num_wann),k=1,num_kpts)
+        close(20)
       endif
 
       num_tot_bands=num_exclude_bands+num_bands

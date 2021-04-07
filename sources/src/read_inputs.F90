@@ -62,6 +62,7 @@ contains
     endif
 
   end subroutine
+
   subroutine Read_wan_chk()
 
     use constants, only: cmplx_0,eps6
@@ -94,83 +95,83 @@ contains
             open(unit=20,file=trim(seedname)//'.chk',status='old',form='unformatted')
         endif
     else
-    inquire(file='wannier90.chk',exist=iffile)
-    if (iffile.eqv. .false.)then
-       write(*,*) 'wannier90.chk must be present!!'
-       STOP
-    else
-       open(unit=20,file='wannier90.chk',status='old',form='unformatted')
+        inquire(file='wannier90.chk',exist=iffile)
+        if (iffile.eqv. .false.)then
+           write(*,*) 'wannier90.chk must be present!!'
+           STOP
+        else
+            open(unit=20,file='wannier90.chk',status='old',form='unformatted')
         endif
     endif
-       read(20) header
-       read(20) num_bands
-       read(20) num_exclude_bands
-       if (.not. allocated(excl_bands)) then
-         allocate (excl_bands(num_exclude_bands), stat=ierr)
-         if (ierr /= 0) call io_error('Error allocating excl_bands in Read_wan_chk')
-       endif
-       read(20) (excl_bands(i),i=1,num_exclude_bands)
-       read(20) ((real_latt(i,j),i=1,3),j=1,3)  ! Real lattice
-       read(20) ((recip_latt(i,j),i=1,3),j=1,3)  ! Reciprocal lattice
-       read(20) num_kpts                ! K-points
-       read(20) (mp_grid(i),i=1,3)         ! M-P grid
-       if (.not. allocated(kpt_latt)) then
-         allocate (kpt_latt(3,num_kpts), stat=ierr)
-         if (ierr /= 0) call io_error('Error allocating kpt_latt in Read_wan_chk')
-       endif
-       read(20) ((kpt_latt(i,nkp),i=1,3),nkp=1,num_kpts)
-       read(20) nntot                ! nntot
-       read(20) num_wann                ! num_wann
-       !if
-       read(20) checkpoint             ! checkpoint
-       read(20) have_disentangled      ! whether a disentanglement has been performed
-       if (have_disentangled) then
-          read(20) omega_invariant     ! omega invariant
-       ! lwindow
-          if (.not. allocated(lwindow)) then
+    read(20) header
+    read(20) num_bands
+    read(20) num_exclude_bands
+    if (.not. allocated(excl_bands)) then
+        allocate (excl_bands(num_exclude_bands), stat=ierr)
+        if (ierr /= 0) call io_error('Error allocating excl_bands in Read_wan_chk')
+    endif
+    read(20) (excl_bands(i),i=1,num_exclude_bands)
+    read(20) ((real_latt(i,j),i=1,3),j=1,3)  ! Real lattice
+    read(20) ((recip_latt(i,j),i=1,3),j=1,3)  ! Reciprocal lattice
+    read(20) num_kpts                ! K-points
+    read(20) (mp_grid(i),i=1,3)         ! M-P grid
+    if (.not. allocated(kpt_latt)) then
+        allocate (kpt_latt(3,num_kpts), stat=ierr)
+        if (ierr /= 0) call io_error('Error allocating kpt_latt in Read_wan_chk')
+    endif
+    read(20) ((kpt_latt(i,nkp),i=1,3),nkp=1,num_kpts)
+    read(20) nntot                ! nntot
+    read(20) num_wann                ! num_wann
+    !if
+    read(20) checkpoint             ! checkpoint
+    read(20) have_disentangled      ! whether a disentanglement has been performed
+    if (have_disentangled) then
+        read(20) omega_invariant     ! omega invariant
+        ! lwindow
+        if (.not. allocated(lwindow)) then
             allocate (lwindow(num_bands, num_kpts), stat=ierr)
             if (ierr /= 0) call io_error('Error allocating lwindow in Read_wan_chk')
-          endif
-          read(20) ((lwindow(i,nkp),i=1,num_bands),nkp=1,num_kpts)
-       ! ndimwin
-          if (.not. allocated(ndimwin)) then
+        endif
+        read(20) ((lwindow(i,nkp),i=1,num_bands),nkp=1,num_kpts)
+        ! ndimwin
+        if (.not. allocated(ndimwin)) then
             allocate (ndimwin(num_kpts), stat=ierr)
             if (ierr /= 0) call io_error('Error allocating ndimwin in Read_wan_chk')
-          endif
-          read(20) (ndimwin(nkp),nkp=1,num_kpts)
-       ! U_matrix_opt
-          if (.not. allocated(u_matrix_opt)) then
+        endif
+        read(20) (ndimwin(nkp),nkp=1,num_kpts)
+        ! U_matrix_opt
+        if (.not. allocated(u_matrix_opt)) then
             allocate (u_matrix_opt(num_bands,num_wann,num_kpts), stat=ierr)
             if (ierr /= 0) call io_error('Error allocating u_matrix_opt in Read_wan_chk')
-          endif
-          read(20) (((u_matrix_opt(i,j,nkp),i=1,num_bands),j=1,num_wann),nkp=1,num_kpts)
-       else
-          !write(*,*) 'No U_matrix_opt ? Probably set identity'
-          !STOP
-          if (.not. allocated(lwindow)) then
+        endif
+        read(20) (((u_matrix_opt(i,j,nkp),i=1,num_bands),j=1,num_wann),nkp=1,num_kpts)
+    else
+        !write(*,*) 'No U_matrix_opt ? Probably set identity'
+        !STOP
+        if (.not. allocated(lwindow)) then
             allocate (lwindow(num_bands, num_kpts), stat=ierr)
             if (ierr /= 0) call io_error('Error allocating lwindow in Read_wan_chk')
-          endif
-          if (.not. allocated(u_matrix_opt)) then
+        endif
+        if (.not. allocated(u_matrix_opt)) then
             allocate (u_matrix_opt(num_bands,num_wann,num_kpts), stat=ierr)
             if (ierr /= 0) call io_error('Error allocating u_matrix_opt in Read_wan_chk')
-          endif
-          do nkp=1,num_kpts
-            do j=1, num_bands
-              lwindow(j,nkp)=.TRUE.
-              do i=1, num_wann
-                if (i.eq.j) u_matrix_opt(j,i,nkp)=1.0
-              enddo
+            do nkp=1,num_kpts
+                do j=1, num_bands
+                    lwindow(j,nkp)=.TRUE.
+                    do i=1, num_wann
+                        if (i.eq.j) u_matrix_opt(j,i,nkp)=1.0
+                    enddo
+                enddo
             enddo
-          enddo
-       endif
-        ! U_matrix
-       if (.not. allocated(u_matrix)) then
-         allocate (u_matrix(num_wann,num_wann,num_kpts), stat=ierr)
-         if (ierr /= 0) call io_error('Error allocating u_matrix in Read_wan_chk')
-       endif
-       read(20) (((u_matrix(i,j,k),i=1,num_wann),j=1,num_wann),k=1,num_kpts)
-       close(20)
+        endif
+    endif
+    ! U_matrix
+    if (.not. allocated(u_matrix)) then
+        allocate (u_matrix(num_wann,num_wann,num_kpts), stat=ierr)
+        if (ierr /= 0) call io_error('Error allocating u_matrix in Read_wan_chk')
+    endif
+    read(20) (((u_matrix(i,j,k),i=1,num_wann),j=1,num_wann),k=1,num_kpts)
+    close(20)
 
     num_tot_bands=num_exclude_bands+num_bands
 
@@ -429,26 +430,26 @@ contains
             open(unit=30,file=trim(seedname)//'.amn',status='old',form='formatted')
         endif
     else
-    inquire(file='wannier90.amn',exist=iffile)
-    if (iffile.eqv. .false.)then
-       write(*,*) 'wannier90.amn must be present!!'
-       STOP
-    else
-       open(unit=30,file='wannier90.amn',status='old',form='formatted')
-     endif
+        inquire(file='wannier90.amn',exist=iffile)
+        if (iffile.eqv. .false.)then
+            write(*,*) 'wannier90.amn must be present!!'
+            STOP
+        else
+            open(unit=30,file='wannier90.amn',status='old',form='formatted')
+        endif
     endif
-       read(30,*) header
-       read(30,*) header
-       do i=1,num_kpts
-         do j=1,num_wann
-           do k=1,num_bands
-             read(30,*) idx1,idx2,idx3,A_re,A_im
-             !write(*,*) A_re, A_im
-             amn_mat(k,j,i)=dcmplx(A_re,A_im)
-           enddo
-         enddo
-       enddo
-       close(30)
+    read(30,*) header
+    read(30,*) header
+    do i=1,num_kpts
+        do j=1,num_wann
+            do k=1,num_bands
+                read(30,*) idx1,idx2,idx3,A_re,A_im
+                !write(*,*) A_re, A_im
+                amn_mat(k,j,i)=dcmplx(A_re,A_im)
+            enddo
+        enddo
+    enddo
+    close(30)
 
     !write(*,*) amn_mat(1,1,1)
   end subroutine Read_wan_amn
@@ -488,42 +489,42 @@ contains
         endif
 
     else
-    inquire(file='wannier90.eig',exist=iffile)
-    if (iffile.eqv. .false.) then
-       write(*,*) 'wannier90.eig must be present!!'
-       STOP
-    else
-       open(unit=20,file='wannier90.eig',status='old',form='formatted')
+        inquire(file='wannier90.eig',exist=iffile)
+        if (iffile.eqv. .false.) then
+           write(*,*) 'wannier90.eig must be present!!'
+           STOP
+        else
+           open(unit=20,file='wannier90.eig',status='old',form='formatted')
         endif
     endif
-       DO nkp=1,num_kpts
-         DO nb=1,num_bands
-           read(20,*) x,y,eigvals(nb,nkp)
-         ENDDO
-       ENDDO
+    DO nkp=1,num_kpts
+        DO nb=1,num_bands
+            read(20,*) x,y,eigvals(nb,nkp)
+        ENDDO
+    ENDDO
 
 
     lforce=.false.
     inquire(file='wannier90.deig',exist=iffile)
     if (iffile.eqv..true.) lforce=.true.
     if (lforce.eqv..true.) then
-      if (.not. allocated(deig)) then
-        allocate (deig(num_bands,num_kpts), stat=ierr)
-        if (ierr /= 0) call io_error('Error allocating deig in Read_wan_win')
-      endif
+        if (.not. allocated(deig)) then
+            allocate (deig(num_bands,num_kpts), stat=ierr)
+            if (ierr /= 0) call io_error('Error allocating deig in Read_wan_win')
+        endif
 
-      deig=0.0_dp
-      if (iffile.eqv. .false.) then
-         write(*,*) 'wannier90.deig is not found! Force will not be computed'
-         STOP
-      else
-         open(unit=20,file='wannier90.deig',status='old',form='formatted')
-         DO nkp=1,num_kpts
-           DO nb=1,num_bands
-             read(20,*) x,y,deig(nb,nkp)
-           ENDDO
-         ENDDO
-      endif
+        deig=0.0_dp
+        if (iffile.eqv. .false.) then
+            write(*,*) 'wannier90.deig is not found! Force will not be computed'
+            STOP
+        else
+            open(unit=20,file='wannier90.deig',status='old',form='formatted')
+            DO nkp=1,num_kpts
+                DO nb=1,num_bands
+                    read(20,*) x,y,deig(nb,nkp)
+                ENDDO
+            ENDDO
+        endif
     endif
   end subroutine Read_wan_eig
 

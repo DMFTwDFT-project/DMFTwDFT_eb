@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import argparse
 import glob
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     main_out.flush()
 
     DMFT_iter.write(
-        "%9s %13s %13s %13s %13s %13s %13s"
+        "%12s %12s %12s %12s %12s %12s %12s' "
         % ("# mu", "TOT_ELEC", "Nd[0]", "Nd[-1]", "EKIN", "Sigoo-Vdc", "<d_epsk>")
     )
     DMFT_iter.write("\n")

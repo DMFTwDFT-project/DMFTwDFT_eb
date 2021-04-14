@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import argparse
 import os
@@ -842,7 +842,7 @@ class DMFTLauncher:
             done_word = fi.readlines()[-1]
             fi.close()
 
-            if done_word.split()[0] == "Job":
+            if done_word.split()[0] == "Job" or done_word.split()[1] == "End":
                 print("DFT calculation complete.\n")
 
             else:

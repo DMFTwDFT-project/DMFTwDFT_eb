@@ -382,6 +382,7 @@
       COMMON /BEEFENS/ LBEEFCALCBASIS,LBEEFBAS
 #endif
 
+      ! These are declared in mlwf.F
       !integer, parameter :: dp = kind(1.0d0)
       !real(kind=dp),allocatable :: DMFT_eval_(:,:)
       !complex(kind=dp),allocatable :: DMFT_evec_(:,:,:)
@@ -391,7 +392,8 @@
       COMPLEX(q),allocatable :: WProj(:,:,:),WProj_tot(:,:,:)
       REAL(q),allocatable :: FERWE(:,:)
 
-      integer eig_i,eig_k,num_wannier
+      integer eig_i,eig_k
+      REAL(q) DMFT_eval_norm
 
       INTERFACE
         subroutine Compute_DMFT(n_kpts_loc,n_wann,kpt_dft,wght_dft,band_win_loc,DMFT_eval,DMFT_evec)
@@ -2660,19 +2662,21 @@
                 WRITE(TIU0,*)'DFT+DMFT run with DMFTwDFT'
 
 
-           num_wannier=0
-           CALL ParseWannier90(num_wannier)
+           num_wann_=0
+           CALL ParseWannier90(num_wann_)
 
 
            CALL CHECK_FULL_KPOINTS
            !num_wann_=14
-           num_wann_ = num_wannier
            !allocate(DMFT_eval_(28,KPOINTS_FULL%NKPTS))
            !allocate(DMFT_evec_(28,28,KPOINTS_FULL%NKPTS))
            !allocate(band_win_(2,KPOINTS_FULL%NKPTS))
            allocate(DMFT_eval_(num_wann_,WDES%NKPTS))
            allocate(DMFT_evec_(num_wann_,num_wann_,WDES%NKPTS))
            allocate(band_win_(2,WDES%NKPTS))
+           DMFT_eval_ = 0.0_dp
+           DMFT_evec_ = (0.0_dp,0.0_dp)
+           band_win_ = 0
            !CALL MLWF_WANNIER90_AMN(WDES,W,P,CQIJ,T_INFO,LATT_CUR,INFO,IO)
            !CALL MPI_barrier( WDES%COMM%MPI_COMM, ierr )
            !write(*,*) 'hi'
@@ -2687,6 +2691,7 @@
 
 !            write(*,*) "RSPIN: "
 !            write(*,*) W%WDES%RSPIN
+            DMFT_eval_norm = 0.0_dp
             open(1, file = 'dmft-nkij_eig_vasp.dat',status="REPLACE")
             write(1,*) "k, wk, band, n_kij_eig"
             do eig_k=1,WDES%NKPTS
